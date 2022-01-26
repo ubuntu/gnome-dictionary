@@ -1,0 +1,79 @@
+name: gnome-dictionary
+adopt-info: gnome-dictionary
+summary: Check word definitions and spellings in an online dictionary
+description: |
+  GNOME Dictionary is a simple dictionary application that looks up
+  definitions of words online.
+
+  Though it looks up English definitions by default, you can easily switch to
+  Spanish or add other online dictionaries using the DICT protocol to suit your
+  needs.
+
+grade: stable # must be 'stable' to release into candidate/stable channels
+confinement: strict
+base: core18
+
+plugs:
+  gnome-3-28-1804:
+    interface: content
+    target: $SNAP/gnome-platform
+    default-provider: gnome-3-28-1604
+  gtk-3-themes:
+    interface: content
+    target: $SNAP/data-dir/themes
+    default-provider: gtk-common-themes
+  icon-themes:
+    interface: content
+    target: $SNAP/data-dir/icons
+    default-provider: gtk-common-themes
+
+slots:
+  # for GtkApplication registration
+  gnome-dictionary:
+    interface: dbus
+    bus: session
+    name: org.gnome.Dictionary
+
+apps:
+  gnome-dictionary:
+    command: desktop-launch gnome-dictionary
+    plugs:
+      - desktop
+      - desktop-legacy
+      - network
+      - gsettings
+      - unity7
+      - wayland
+    desktop: usr/share/applications/org.gnome.Dictionary.desktop
+
+parts:
+  desktop-gnome-platform:
+    source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
+    source-subdir: gtk
+    plugin: make
+    make-parameters: ["FLAVOR=gtk3"]
+    build-packages:
+      - libgtk-3-dev
+    override-build: |
+      snapcraftctl build
+      mkdir -pv $SNAPCRAFT_PART_INSTALL/gnome-platform
+  gnome-dictionary:
+    after: [desktop-gnome-platform]
+    source: https://gitlab.gnome.org/GNOME/gnome-dictionary.git
+    source-type: git
+    source-tag: '40.0'
+    plugin: meson
+    meson-parameters: [--prefix=/snap/gnome-dictionary/current/usr]
+    organize:
+      snap/gnome-dictionary/current/usr: usr
+    build-packages:
+      - gettext
+      - gsettings-desktop-schemas-dev
+      - itstool
+      - libglib2.0-dev
+      - libgtk-3-dev
+      - gobject-introspection
+      - libgirepository1.0-dev
+    override-pull: |
+      snapcraftctl pull
+      snapcraftctl set-version $(git describe --tags --abbrev=10)
