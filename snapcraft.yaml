@@ -34,17 +34,10 @@ parts:
     source-type: git
     source-tag: '40.0'
     plugin: meson
+    meson-version: 0.58.1
     meson-parameters: [--prefix=/snap/gnome-dictionary/current/usr]
     organize:
       snap/gnome-dictionary/current/usr: usr
-    #build-packages:
-    #  - gettext
-    #  - gsettings-desktop-schemas-dev
-    #  - itstool
-    #  - libglib2.0-dev
-    #  - libgtk-3-dev
-    #  - gobject-introspection
-    #  - libgirepository1.0-dev
     override-pull: |
       snapcraftctl pull
       snapcraftctl set-version $(git describe --tags --abbrev=10)
