@@ -32,9 +32,9 @@ parts:
   gnome-dictionary:
     source: https://gitlab.gnome.org/GNOME/gnome-dictionary.git
     source-type: git
-    source-tag: '40.0'
+    #source-tag: '40.0'
     plugin: meson
-    meson-version: 0.58.1
+    #meson-version: 0.61.0
     meson-parameters: [--prefix=/snap/gnome-dictionary/current/usr]
     organize:
       snap/gnome-dictionary/current/usr: usr
