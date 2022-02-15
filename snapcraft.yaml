@@ -41,3 +41,5 @@ parts:
     override-pull: |
       snapcraftctl pull
       snapcraftctl set-version $(git describe --tags --abbrev=10)
+      # Remove the meson.build line for erroring on redundant-declarations
+      sed -i.bak -e '/.*-Werror=redundant-decls.*$/d' src/meson.build
