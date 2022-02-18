@@ -11,21 +11,7 @@ description: |
 
 grade: stable # must be 'stable' to release into candidate/stable channels
 confinement: strict
-base: core18
-
-plugs:
-  gnome-3-28-1804:
-    interface: content
-    target: $SNAP/gnome-platform
-    default-provider: gnome-3-28-1604
-  gtk-3-themes:
-    interface: content
-    target: $SNAP/data-dir/themes
-    default-provider: gtk-common-themes
-  icon-themes:
-    interface: content
-    target: $SNAP/data-dir/icons
-    default-provider: gtk-common-themes
+base: core20
 
 slots:
   # for GtkApplication registration
@@ -36,44 +22,29 @@ slots:
 
 apps:
   gnome-dictionary:
-    command: desktop-launch gnome-dictionary
+    command: usr/bin/gnome-dictionary
+    extensions: [gnome-3-38]
     plugs:
-      - desktop
-      - desktop-legacy
       - network
-      - gsettings
-      - unity7
-      - wayland
     desktop: usr/share/applications/org.gnome.Dictionary.desktop
 
 parts:
-  desktop-gnome-platform:
-    source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
-    source-subdir: gtk
-    plugin: make
-    make-parameters: ["FLAVOR=gtk3"]
-    build-packages:
-      - libgtk-3-dev
-    override-build: |
-      snapcraftctl build
-      mkdir -pv $SNAPCRAFT_PART_INSTALL/gnome-platform
   gnome-dictionary:
-    after: [desktop-gnome-platform]
     source: https://gitlab.gnome.org/GNOME/gnome-dictionary.git
     source-type: git
-    source-tag: '40.0'
+    #source-tag: '40.0'
     plugin: meson
+    #meson-version: 0.61.0
     meson-parameters: [--prefix=/snap/gnome-dictionary/current/usr]
     organize:
       snap/gnome-dictionary/current/usr: usr
-    build-packages:
-      - gettext
-      - gsettings-desktop-schemas-dev
-      - itstool
-      - libglib2.0-dev
-      - libgtk-3-dev
-      - gobject-introspection
-      - libgirepository1.0-dev
     override-pull: |
       snapcraftctl pull
       snapcraftctl set-version $(git describe --tags --abbrev=10)
+      # Remove the meson.build line for erroring on redundant-declarations
+      sed -i.bak -e '/.*-Werror=redundant-decls.*$/d' src/meson.build
+    override-build: |
+      sed -i.bak -e 's|Icon=@application_id@$|Icon=${SNAP}/meta/gui/org.gnome.Dictionary.svg|g' $SNAPCRAFT_PART_SRC/data/org.gnome.Dictionary.desktop.in.in
+      mkdir -p $SNAPCRAFT_PART_INSTALL/meta/gui/
+      cp $SNAPCRAFT_PART_SRC/data/icons/scalable/org.gnome.Dictionary.svg $SNAPCRAFT_PART_INSTALL/meta/gui/
+      snapcraftctl build
