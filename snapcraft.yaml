@@ -11,7 +11,7 @@ description: |
 
 grade: stable # must be 'stable' to release into candidate/stable channels
 confinement: strict
-base: core20
+base: core22
 
 slots:
   # for GtkApplication registration
@@ -23,26 +23,36 @@ slots:
 apps:
   gnome-dictionary:
     command: usr/bin/gnome-dictionary
-    extensions: [gnome-3-38]
+    extensions: [gnome]
     plugs:
       - network
     desktop: usr/share/applications/org.gnome.Dictionary.desktop
 
 parts:
+  meson-deps:
+    plugin: nil
+    source: https://github.com/mesonbuild/meson.git
+    source-tag: '0.62.2'
+    override-build: |
+      pip install .
+    build-packages:
+      - python3-pip
+      - ninja-build
+
   gnome-dictionary:
     source: https://gitlab.gnome.org/GNOME/gnome-dictionary.git
     source-type: git
-    #source-tag: '40.0'
+    after: [ meson-deps ]
+    source-tag: '40.0'
     plugin: meson
-    #meson-version: 0.61.0
-    meson-parameters: [--prefix=/snap/gnome-dictionary/current/usr]
-    organize:
-      snap/gnome-dictionary/current/usr: usr
+    meson-parameters:
+      - --prefix=/usr
     override-pull: |
       snapcraftctl pull
       snapcraftctl set-version $(git describe --tags --abbrev=10)
       # Remove the meson.build line for erroring on redundant-declarations
       sed -i.bak -e '/.*-Werror=redundant-decls.*$/d' src/meson.build
+      patch -p1 < $SNAPCRAFT_PROJECT_DIR/patches/01-fix_build.diff
     override-build: |
       sed -i.bak -e 's|Icon=@application_id@$|Icon=${SNAP}/meta/gui/org.gnome.Dictionary.svg|g' $SNAPCRAFT_PART_SRC/data/org.gnome.Dictionary.desktop.in.in
       mkdir -p $SNAPCRAFT_PART_INSTALL/meta/gui/
