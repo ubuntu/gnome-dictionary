@@ -29,32 +29,21 @@ apps:
     desktop: usr/share/applications/org.gnome.Dictionary.desktop
 
 parts:
-  meson-deps:
-    plugin: nil
-    source: https://github.com/mesonbuild/meson.git
-    source-tag: '0.62.2'
-    override-build: |
-      pip install .
-    build-packages:
-      - python3-pip
-      - ninja-build
-
   gnome-dictionary:
     source: https://gitlab.gnome.org/GNOME/gnome-dictionary.git
     source-type: git
-    after: [ meson-deps ]
     source-tag: '40.0'
     plugin: meson
     meson-parameters:
       - --prefix=/usr
     override-pull: |
-      snapcraftctl pull
-      snapcraftctl set-version $(git describe --tags --abbrev=10)
+      craftctl default
+      craftctl set version=$(git describe --tags --abbrev=10)
       # Remove the meson.build line for erroring on redundant-declarations
       sed -i.bak -e '/.*-Werror=redundant-decls.*$/d' src/meson.build
-      patch -p1 < $SNAPCRAFT_PROJECT_DIR/patches/01-fix_build.diff
+      patch -p1 < $CRAFT_PROJECT_DIR/patches/01-fix_build.diff
     override-build: |
-      sed -i.bak -e 's|Icon=@application_id@$|Icon=${SNAP}/meta/gui/org.gnome.Dictionary.svg|g' $SNAPCRAFT_PART_SRC/data/org.gnome.Dictionary.desktop.in.in
-      mkdir -p $SNAPCRAFT_PART_INSTALL/meta/gui/
-      cp $SNAPCRAFT_PART_SRC/data/icons/scalable/org.gnome.Dictionary.svg $SNAPCRAFT_PART_INSTALL/meta/gui/
-      snapcraftctl build
+      sed -i.bak -e 's|Icon=@application_id@$|Icon=${SNAP}/meta/gui/org.gnome.Dictionary.svg|g' $CRAFT_PART_SRC/data/org.gnome.Dictionary.desktop.in.in
+      mkdir -p $CRAFT_PART_INSTALL/meta/gui/
+      cp $CRAFT_PART_SRC/data/icons/scalable/org.gnome.Dictionary.svg $CRAFT_PART_INSTALL/meta/gui/
+      craftctl default
