@@ -36,6 +36,7 @@ parts:
     plugin: meson
     meson-parameters:
       - --prefix=/usr
+      - --buildtype=release
     override-pull: |
       craftctl default
       craftctl set version=$(git describe --tags --abbrev=10)
