@@ -34,6 +34,7 @@ parts:
     source-type: git
     source-tag: '40.0'
     plugin: meson
+    parse-info: [usr/share/metainfo/org.gnome.Dictionary.appdata.xml]
     meson-parameters:
       - --prefix=/usr
       - --buildtype=release
