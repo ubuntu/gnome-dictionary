@@ -1,3 +1,6 @@
+# This patch modifies the meson.build files to make them work
+# with the current MESON syntax.
+
 diff --git a/data/appdata/meson.build b/data/appdata/meson.build
 index 1dc4ed7..65a044f 100644
 --- a/data/appdata/meson.build
