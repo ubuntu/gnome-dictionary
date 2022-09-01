@@ -11,7 +11,7 @@ description: |
 
 grade: stable # must be 'stable' to release into candidate/stable channels
 confinement: strict
-base: core20
+base: core22
 
 slots:
   # for GtkApplication registration
@@ -23,7 +23,7 @@ slots:
 apps:
   gnome-dictionary:
     command: usr/bin/gnome-dictionary
-    extensions: [gnome-3-38]
+    extensions: [gnome]
     plugs:
       - network
     desktop: usr/share/applications/org.gnome.Dictionary.desktop
@@ -32,19 +32,20 @@ parts:
   gnome-dictionary:
     source: https://gitlab.gnome.org/GNOME/gnome-dictionary.git
     source-type: git
-    #source-tag: '40.0'
+    source-tag: '40.0'
     plugin: meson
-    #meson-version: 0.61.0
-    meson-parameters: [--prefix=/snap/gnome-dictionary/current/usr]
-    organize:
-      snap/gnome-dictionary/current/usr: usr
+    parse-info: [usr/share/metainfo/org.gnome.Dictionary.appdata.xml]
+    meson-parameters:
+      - --prefix=/usr
+      - --buildtype=release
     override-pull: |
-      snapcraftctl pull
-      snapcraftctl set-version $(git describe --tags --abbrev=10)
+      craftctl default
+      craftctl set version=$(git describe --tags --abbrev=10)
       # Remove the meson.build line for erroring on redundant-declarations
       sed -i.bak -e '/.*-Werror=redundant-decls.*$/d' src/meson.build
+      patch -p1 < $CRAFT_PROJECT_DIR/patches/01-adapt-to-newer-meson-syntax.diff
     override-build: |
-      sed -i.bak -e 's|Icon=@application_id@$|Icon=${SNAP}/meta/gui/org.gnome.Dictionary.svg|g' $SNAPCRAFT_PART_SRC/data/org.gnome.Dictionary.desktop.in.in
-      mkdir -p $SNAPCRAFT_PART_INSTALL/meta/gui/
-      cp $SNAPCRAFT_PART_SRC/data/icons/scalable/org.gnome.Dictionary.svg $SNAPCRAFT_PART_INSTALL/meta/gui/
-      snapcraftctl build
+      sed -i.bak -e 's|Icon=@application_id@$|Icon=${SNAP}/meta/gui/org.gnome.Dictionary.svg|g' $CRAFT_PART_SRC/data/org.gnome.Dictionary.desktop.in.in
+      mkdir -p $CRAFT_PART_INSTALL/meta/gui/
+      cp $CRAFT_PART_SRC/data/icons/scalable/org.gnome.Dictionary.svg $CRAFT_PART_INSTALL/meta/gui/
+      craftctl default
