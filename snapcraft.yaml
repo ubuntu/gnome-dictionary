@@ -34,6 +34,10 @@ parts:
     source-type: git
     source-tag: '40.0'
     source-depth: 1
+# ext:updatesnap
+#   version-format:
+#     lower-than: '41'
+#     no-9x-revisions: true
     plugin: meson
     parse-info: [usr/share/metainfo/org.gnome.Dictionary.appdata.xml]
     meson-parameters:
