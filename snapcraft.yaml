@@ -33,6 +33,7 @@ parts:
     source: https://gitlab.gnome.org/GNOME/gnome-dictionary.git
     source-type: git
     source-tag: '40.0'
+    source-depth: 1
     plugin: meson
     parse-info: [usr/share/metainfo/org.gnome.Dictionary.appdata.xml]
     meson-parameters:
