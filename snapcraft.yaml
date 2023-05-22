@@ -30,7 +30,7 @@ apps:
 
 parts:
   gnome-dictionary:
-    source: https://gitlab.gnome.org/GNOME/gnome-dictionary.git
+    source: https://gitlab.gnome.org/Archive/gnome-dictionary.git
     source-type: git
     source-tag: '40.0'
     source-depth: 1
